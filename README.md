@@ -39,6 +39,7 @@ Inner-product functional encryption · Heterogeneous communication · Aggregate 
 | Path | Description |
 | --- | --- |
 | `paper/` | Preprint / manuscript PDF of the paper |
+| `simulation/` | Experiment code: the OMNeT++/Veins/SUMO implementation of the protocol, the SUMO scenario generation, the experiment harnesses and the analysis scripts — see [`simulation/README.md`](simulation/README.md) |
 | `README.md` | This file |
 
 ## Reference

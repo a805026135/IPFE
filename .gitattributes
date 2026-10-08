@@ -1,0 +1,23 @@
+# Normalise line endings in the repository: all text files are stored with LF
+# so that the shell/python scripts run unchanged on Linux, macOS and Windows.
+* text=auto eol=lf
+
+*.sh    text eol=lf
+*.py    text eol=lf
+*.java  text eol=lf
+*.ini   text eol=lf
+*.xml   text eol=lf
+*.ned   text eol=lf
+*.msg   text eol=lf
+*.cc    text eol=lf
+*.h     text eol=lf
+*.md    text eol=lf
+*.txt   text eol=lf
+*.csv   text eol=lf
+*.properties text eol=lf
+
+# Binary assets
+*.png binary
+*.pdf binary
+*.jar binary
+*.osm binary

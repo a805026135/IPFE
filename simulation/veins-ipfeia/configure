@@ -1,0 +1,54 @@
+#!/usr/bin/env python3
+
+"""
+Creates Makefile(s) for building the IPFE-IA Veins simulation.
+
+Usage (from the veins-ipfeia directory, inside an OMNeT++ shell):
+    ./configure --with-veins=../veins-src
+    make
+"""
+
+import os
+import sys
+import subprocess
+from optparse import OptionParser
+
+parser = OptionParser()
+parser.add_option("--with-veins", dest="veins", help="path of the Veins root directory [default: ../veins-src]", metavar="PATH", default="../veins-src")
+(options, args) = parser.parse_args()
+
+if not os.path.isfile(os.path.join(options.veins, "print-veins-version")):
+    print("Error: %s does not look like a Veins root directory (print-veins-version missing)." % options.veins)
+    sys.exit(1)
+
+# opp_msgtool resolves msg imports only against absolute include paths on
+# MinGW, so use abspath here even though relative would work for gcc.
+veins = os.path.abspath(options.veins)
+
+# -f --deep          : compile all sources below src/
+# --make-so          : build src/libipfeia.so loaded on top of libveins
+# -I/-L/-l           : find Veins headers and link libveins
+makemake_flags = [
+    "-f", "--deep", "--no-deep-includes", "--make-so",
+    "-I", ".",
+    "-I", os.path.join(veins, "src"),
+    "-L", os.path.join(veins, "src"),
+    "-lveins$(D)",
+    "-o", "ipfeia", "-O", "out", "-p", "IPFEIA",
+]
+
+if not os.path.isdir("out"):
+    os.mkdir("out")
+
+import shlex
+cmd = "opp_makemake " + " ".join(shlex.quote(f) for f in makemake_flags)
+# write the command into a shell script file: native-python -> bash -c mangles
+# the argv (MSYS path conversion), while script file content passes verbatim
+with open("src/_makemake.sh", "w", newline="\n") as f:
+    f.write("#!/bin/bash\n" + cmd + "\n")
+subprocess.check_call(["bash", "_makemake.sh"], cwd="src")
+os.remove("src/_makemake.sh")
+
+print('Configure done. You can now run "make MODE=release".')
+print("Then start sumo-launchd and run, e.g.:")
+print("  opp_run -u Cmdenv -n src:../veins-src/src -l ../veins-src/src/libveins.so -l src/libipfeia.so -c O2M_AGG --scenario=c100_v50 omnetpp.ini")
